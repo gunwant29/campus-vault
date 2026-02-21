@@ -26,6 +26,12 @@ const userSchema = new mongoose.Schema(
       enum: ["student", "admin"],
       default: "student",
     },
+    bookmarks: [
+  {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Note"
+  }
+]
   },
   { timestamps: true }
 );

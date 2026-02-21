@@ -1,3 +1,4 @@
+const User = require("../models/User");
 const Note = require("../models/Note");
 const cloudinary = require("../config/cloudinary");
 
@@ -86,6 +87,103 @@ exports.getNotes = async (req, res) => {
 
   } catch (error) {
     console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.toggleUpvote = async (req, res) => {
+  try {
+    const note = await Note.findById(req.params.id);
+
+    if (!note) {
+      return res.status(404).json({ message: "Note not found" });
+    }
+
+    const userId = req.user._id;
+
+    const alreadyUpvoted = note.upvotes.includes(userId);
+
+    if (alreadyUpvoted) {
+      // Remove vote
+      note.upvotes = note.upvotes.filter(
+        (id) => id.toString() !== userId.toString()
+      );
+    } else {
+      // Add vote
+      note.upvotes.push(userId);
+    }
+
+    await note.save();
+
+    res.json({
+      message: alreadyUpvoted ? "Upvote removed" : "Upvoted",
+      totalUpvotes: note.upvotes.length,
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.downloadNote = async (req, res) => {
+  try {
+    const note = await Note.findById(req.params.id);
+
+    if (!note) {
+      return res.status(404).json({ message: "Note not found" });
+    }
+
+    // Increment download count
+    note.downloads += 1;
+    await note.save();
+
+    res.json({
+      message: "Download count updated",
+      fileUrl: note.fileUrl,
+      totalDownloads: note.downloads,
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.toggleBookmark = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    const noteId = req.params.id;
+
+    const alreadyBookmarked = user.bookmarks.includes(noteId);
+
+    if (alreadyBookmarked) {
+      user.bookmarks = user.bookmarks.filter(
+        (id) => id.toString() !== noteId.toString()
+      );
+    } else {
+      user.bookmarks.push(noteId);
+    }
+
+    await user.save();
+
+    res.json({
+      message: alreadyBookmarked ? "Bookmark removed" : "Bookmarked",
+      totalBookmarks: user.bookmarks.length
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getUserBookmarks = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+      .populate("bookmarks");
+
+    res.json(user.bookmarks);
+
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
