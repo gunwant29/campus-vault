@@ -1,0 +1,30 @@
+body {
+  background-color: #f8fafc;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.brand-color {
+  color: #2563eb;
+}
+
+.btn-primary-custom {
+  background-color: #2563eb;
+  border: none;
+}
+
+.btn-primary-custom:hover {
+  background-color: #1d4ed8;
+}
+
+.card-custom {
+  border-radius: 14px;
+  border: none;
+}
+
+.navbar-custom {
+  background-color: #ffffff;
+}
+
+.shadow-soft {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
