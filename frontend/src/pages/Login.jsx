@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const { login } = useAuth();
+  const navigate = useNavigate();   // navigation hook
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,6 +18,10 @@ const Login = () => {
 
     try {
       await login(email, password);
+
+      // redirect after login
+      navigate("/notes");
+
     } catch {
       setError("Invalid credentials");
     } finally {
@@ -24,58 +30,59 @@ const Login = () => {
   };
 
   return (
-  <div
-    className="d-flex justify-content-center align-items-center"
-    style={{ minHeight: "90vh" }}
-  >
-    <div className="card card-custom shadow-soft p-4" style={{ width: "420px" }}>
-      <h3 className="text-center mb-3 fw-bold brand-color">
-        Welcome Back
-      </h3>
-      <p className="text-center text-muted mb-4">
-        Login to access your notes
-      </p>
+    <div
+      className="d-flex justify-content-center align-items-center"
+      style={{ minHeight: "90vh" }}
+    >
+      <div className="card card-custom shadow-soft p-4" style={{ width: "420px" }}>
+        <h3 className="text-center mb-3 fw-bold brand-color">
+          Welcome Back
+        </h3>
 
-      {error && (
-        <div className="alert alert-danger text-center">
-          {error}
-        </div>
-      )}
+        <p className="text-center text-muted mb-4">
+          Login to access your notes
+        </p>
 
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label className="form-label fw-semibold">Email</label>
-          <input
-            type="email"
-            className="form-control"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
+        {error && (
+          <div className="alert alert-danger text-center">
+            {error}
+          </div>
+        )}
 
-        <div className="mb-4">
-          <label className="form-label fw-semibold">Password</label>
-          <input
-            type="password"
-            className="form-control"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label className="form-label fw-semibold">Email</label>
+            <input
+              type="email"
+              className="form-control"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-        <button
-          type="submit"
-          className="btn btn-primary-custom text-white w-100"
-          disabled={loading}
-        >
-          {loading ? "Logging in..." : "Login"}
-        </button>
-      </form>
+          <div className="mb-4">
+            <label className="form-label fw-semibold">Password</label>
+            <input
+              type="password"
+              className="form-control"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="btn btn-primary-custom text-white w-100"
+            disabled={loading}
+          >
+            {loading ? "Logging in..." : "Login"}
+          </button>
+        </form>
+      </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default Login;

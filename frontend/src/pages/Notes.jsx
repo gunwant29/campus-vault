@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axiosInstance from "../api/axios";
+import { getNotes } from "../services/noteService";
 import NoteCard from "../components/NoteCard";
 
 const Notes = () => {
@@ -7,10 +7,11 @@ const Notes = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Fetch notes when component loads
   useEffect(() => {
     const fetchNotes = async () => {
       try {
-        const res = await axiosInstance.get("/notes");
+        const res = await getNotes();
         setNotes(res.data.notes);
       } catch (err) {
         console.error(err);
@@ -23,6 +24,24 @@ const Notes = () => {
     fetchNotes();
   }, []);
 
+  // Update the note locally after upvote
+  const handleUpvote = (updatedNote) => {
+    setNotes((prevNotes) =>
+      prevNotes.map((note) =>
+        note._id === updatedNote._id ? updatedNote : note
+      )
+    );
+  };
+
+  const handleDownload = (updatedNote) => {
+    setNotes((prevNotes) =>
+      prevNotes.map((note) =>
+        note._id === updatedNote._id ? updatedNote : note
+      )
+    );
+  };
+
+  // Loading state
   if (loading) {
     return (
       <div className="container mt-5 text-center">
@@ -31,6 +50,7 @@ const Notes = () => {
     );
   }
 
+  // Error state
   if (error) {
     return (
       <div className="container mt-5 text-center">
@@ -52,7 +72,11 @@ const Notes = () => {
         <div className="row">
           {notes.map((note) => (
             <div key={note._id} className="col-lg-4 col-md-6 mb-4">
-              <NoteCard note={note} />
+              <NoteCard
+                note={note}
+                onUpvote={handleUpvote}
+                onDownload={handleDownload}
+              />
             </div>
           ))}
         </div>

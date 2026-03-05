@@ -13,7 +13,7 @@ const router = express.Router();
 router.post("/upload", protect, upload.single("file"), uploadNote);
 router.get("/", getNotes);
 router.put("/:id/upvote", protect, toggleUpvote);
-router.get("/:id/download", downloadNote);
+router.get("/:id/download", protect, downloadNote);
 router.get("/bookmarks/me", protect, getUserBookmarks);
 router.put("/:id/bookmark", protect, toggleBookmark);
 

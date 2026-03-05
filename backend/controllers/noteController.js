@@ -99,28 +99,32 @@ exports.toggleUpvote = async (req, res) => {
       return res.status(404).json({ message: "Note not found" });
     }
 
-    const userId = req.user._id;
+    const userId = req.user._id.toString();
 
-    const alreadyUpvoted = note.upvotes.includes(userId);
+    const alreadyUpvoted = note.upvotes.some(
+      (id) => id.toString() === userId
+    );
 
     if (alreadyUpvoted) {
-      // Remove vote
       note.upvotes = note.upvotes.filter(
-        (id) => id.toString() !== userId.toString()
+        (id) => id.toString() !== userId
       );
     } else {
-      // Add vote
       note.upvotes.push(userId);
     }
 
     await note.save();
 
+    const updatedNote = await Note.findById(note._id)
+      .populate("uploadedBy", "name email");
+
     res.json({
-      message: alreadyUpvoted ? "Upvote removed" : "Upvoted",
-      totalUpvotes: note.upvotes.length,
+      message: "Vote updated",
+      note: updatedNote
     });
 
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -133,14 +137,23 @@ exports.downloadNote = async (req, res) => {
       return res.status(404).json({ message: "Note not found" });
     }
 
-    // Increment download count
-    note.downloads += 1;
-    await note.save();
+    const userId = req.user._id.toString();
 
+    const alreadyDownloaded = note.downloadUsers.some(
+      (id) => id.toString() === userId
+    );
+
+    // Only update analytics if first download
+    if (!alreadyDownloaded) {
+      note.downloads += 1;
+      note.downloadUsers.push(userId);
+      await note.save();
+    }
+
+    // ALWAYS allow download
     res.json({
-      message: "Download count updated",
       fileUrl: note.fileUrl,
-      totalDownloads: note.downloads,
+      downloads: note.downloads
     });
 
   } catch (error) {

@@ -34,6 +34,12 @@ const noteSchema = new mongoose.Schema(
                 ref: "User",
             }
         ],
+        downloadUsers: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User"
+            }
+        ],
         downloads: {
             type: Number,
             default: 0,
